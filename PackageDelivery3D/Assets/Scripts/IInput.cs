@@ -6,6 +6,7 @@ using UnityEngine;
 public interface IInput
 {
 	void Movement();
+	void TestingDebugs();
 }
 
 /// <summary>
