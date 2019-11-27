@@ -1,56 +1,167 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour, IInput
 {
-	[SerializeField] private float movementSpeed = 4f;
-	[SerializeField] private float jumpHeight = 2f;
-	[SerializeField] private float gravity = -9.81f;
-	private bool isGrounded;
 
+    /// <summary>
+    /// TODO:
+    /// Fix all protected variables from old import in which this class got inherited
+    /// Fix the crouch collider disable bug
+    /// Fix the dash by actually applying a force instead of a velocity
+    /// Clean up
+    /// </summary>
+    //Declaration of Variables
+    [Header("Componenten")]
 
-	[Header("Collision en Drop Values")]
+    [Tooltip("Character Controller Component")]
 
-	[Tooltip("De transform van het object wat het laagste punt van de speler aangeeft")]
-	[SerializeField] protected Transform groundCheck;
+    [SerializeField] protected CharacterController charController;
 
-	[Tooltip("De radius van de cirkel die om de groundCheck wordt gecast")]
-	[SerializeField] protected float groundDistance = 0.4f;
+    [Space]
 
-	[Tooltip("Layermask om te bepalen wat wordt gezien als de Ground")]
-	[SerializeField] protected LayerMask groundMask;
+    [Header("Movement Values")]
 
-	[SerializeField] private CharacterController charController;
+    [Tooltip("Value voor voorwaartse Beweging")]
+    [SerializeField] private float forwardSpeed;
 
-	private Vector3 velocity = Vector3.zero;
+    [Tooltip("Value voor zijwaartse Beweging")]
+    [SerializeField] private float sidewaysSpeed;
 
-	private Vector3 moveDirection = Vector3.zero;
+    [Tooltip("Value voor SprongHoogte")]
+    [SerializeField] protected float jumpHeight;
 
-	private void Awake()
-	{
-		charController = GetComponent<CharacterController>();
-	}
+    [Tooltip("Value voor Zwaartekracht")]
+    [SerializeField] protected float gravity;
 
-	/// <summary>
-	/// FixedUpdate for Rigidbody and physics related actions.
-	/// </summary>
+    [Tooltip("Value voor de snelheid van het crouchen")]
+    [SerializeField] protected float crouchSpeed;
+
+    [Tooltip("Value voor de kracht van een dash")]
+    [SerializeField] protected float dashForce;
+
+    [Tooltip("Value voor de pauze tussen verschillende dashes")]
+    [SerializeField] protected float dashCooldown;
+
+    [Space]
+
+    [Header("Collision en Drop Values")]
+
+    [Tooltip("Dit object geeft aan wat de hoogte van de speler is terwijl hij croucht")]
+    [SerializeField] protected Transform ceilingCheck;
+
+    [Tooltip("Dit component geeft de nieuwe collision box van de speler terwijl hij crouched")]
+    [SerializeField] protected Collider crouchCollider;
+
+    [Tooltip("De transform van het object wat het laagste punt van de speler aangeeft")]
+    [SerializeField] protected Transform groundCheck;
+
+    [Tooltip("De radius van de cirkel die om de groundCheck wordt gecast")]
+    [SerializeField] protected float groundDistance = 0.4f;
+
+    [Tooltip("Layermask om te bepalen wat wordt gezien als de Ground")]
+    [SerializeField] protected LayerMask groundMask;
+
+    private Vector3 velocity = Vector3.zero;
+    private Vector3 moveDirection = Vector3.zero;
+    private Vector3 dashVelocity = Vector3.zero;
+
+    protected float forwardMovement;
+    protected float sidewaysMovement;
+
+    protected bool jump = false;
+    protected bool crouch = false;
+    protected bool dash = false;
+    protected bool dashing = false;
+    private bool isGrounded;
+
 	public void Update()
 	{
-		Movement();
-	}
+        Movement();
+        jump = false;
+        dash = false;
+    }
 
 	/// <summary>
 	/// This method is public because it derives from IInput (Interface).
 	/// </summary>
 	public void Movement()
 	{
-		float _horizontal = Input.GetAxis("Horizontal");
-		float _vertical = Input.GetAxis("Vertical");
+        forwardMovement = Input.GetAxis("Vertical") * forwardSpeed;
 
-		moveDirection = new Vector3(_horizontal, 0f, _vertical);
+        sidewaysMovement = Input.GetAxis("Horizontal") * sidewaysSpeed;
 
-		isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        ///<summary>
+        ///This if functions as a replacement for the Normalize vector Function 
+        ///as we don't want buggy movement so have to write something ourselves 
+        ///that solves the 2 vectors being added to eachother when walking diagonally
+        /// </summary>
+        if (forwardMovement != 0f && sidewaysMovement != 0f)
+        {
+            float _forward = forwardMovement;
+            float _sideways = sidewaysMovement;
+            if (Mathf.Abs(forwardMovement) > Mathf.Abs(sidewaysMovement))
+            {
+                forwardMovement = Mathf.Clamp(forwardMovement, -forwardSpeed/2f, forwardSpeed/2f);
+                sidewaysMovement = Mathf.Clamp(sidewaysMovement, -sidewaysSpeed/2f, sidewaysSpeed/2f);
+            }
+            else
+            {
+                sidewaysMovement = Mathf.Clamp(sidewaysMovement, -sidewaysSpeed / 2f, sidewaysSpeed / 2f);
+                forwardMovement = Mathf.Clamp(forwardMovement, -forwardSpeed / 2f, forwardSpeed / 2f);
+            }
+        }
+
+        ///<summary>
+        ///Getting all the input from the player
+        /// </summary>
+        if (Input.GetButtonDown("Jump"))
+        {
+            jump = true;
+        }
+        if (Input.GetButtonDown("Dash"))
+        {
+            dash = true;
+        }
+        if (Input.GetButtonDown("Crouch"))
+        {
+            crouch = true;
+        }
+        if (Input.GetButtonUp("Crouch"))
+        {
+            crouch = false;
+            charController.detectCollisions = true;
+            crouchCollider.enabled = false;
+        }
+
+        moveDirection = new Vector3(sidewaysMovement, 0f, forwardMovement);
+
+
+        ///<summary>
+        ///Activates Crouching which should disable the collider from the character controller and enable a smaller collider
+        /// </summary>
+        if (crouch)
+        {
+            Debug.Log("activating Crouch");
+            charController.detectCollisions = false;
+            crouchCollider.enabled = true;
+            moveDirection = moveDirection * crouchSpeed;
+        }
+
+        ///<summary>
+        ///Adds a force to the player for a limited amount of time when the player hasn't dashed already
+        /// </summary>
+        if (dash && !dashing)
+        {
+            StartCoroutine(IsDashing());
+            dashVelocity = moveDirection * dashForce;
+        }
+
+
+        ///<summary>
+        ///Jumping needs to check if player is on the ground or not, when it is it will apply a vertical velocity to the player
+        /// </summary>
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
 		if (isGrounded && velocity.y < 0)
 		{
@@ -58,48 +169,39 @@ public class PlayerMovement : MonoBehaviour, IInput
 		}
 		velocity.y += gravity * Time.deltaTime;
 
-		if(Input.GetButton("Jump") && isGrounded)
+		if(jump && isGrounded)
 		{
 			velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 		}
 
-		moveDirection *= movementSpeed;
 
-		charController.Move(moveDirection * Time.deltaTime);
+        ///<summary>
+        ///Adding actual movement to controller
+        /// </summary>
+        charController.Move(moveDirection * Time.deltaTime);
 		charController.Move(velocity * Time.deltaTime);
-		if (moveDirection != Vector3.zero)
-			transform.rotation = Quaternion.LookRotation(moveDirection);
+        charController.Move(dashVelocity * Time.deltaTime);
 
-		/*
-		float _horizontal = Input.GetAxisRaw("Horizontal");
-		float _vertical = Input.GetAxisRaw("Vertical");
 
-		Vector3 _tempVector = new Vector3(_horizontal, 0, _vertical);
-
-		//_tempVector.normalized because otherwise if you walk diagonal you wil walk faster.
-		_tempVector = _tempVector.normalized * movementSpeed * Time.deltaTime;
-
-		//transform.rotation = Quaternion.LookRotation(_tempVector);
-		rb.MovePosition(transform.position + _tempVector);
-		if (_tempVector != Vector3.zero)
-		{
-			// Do the rotation here
-			rb.MoveRotation(Quaternion.LookRotation(_tempVector));
-		}
-		*/
-
-		/*
-		//Move relative to world space (so rotation doesn't affect movement)
-		float _x = movementSpeed * Input.GetAxis("Horizontal") * Time.deltaTime;
-		float _z = movementSpeed * Input.GetAxis("Vertical") * Time.deltaTime;
-		transform.Translate(_x, 0f, _z, Space.World);
-
-		//Work out angle using atan 2
-		float angle = Mathf.Atan2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")) * Mathf.Rad2Deg;
-
-		//Prevent cube snapping to angle if there is no movement
-		if (Input.GetAxis("Horizontal") != 0f || Input.GetAxis("Vertical") != 0f)
-			transform.rotation = Quaternion.Euler(0f, angle, 0f);
-		*/
+        ///<summary>
+        ///Rotating character to movement direction
+        /// </summary>
+        if (moveDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(moveDirection);
+        }
+        Debug.Log(charController.detectCollisions);
 	}
+
+
+    /// <summary>
+    /// Simple timer to not spam Dashing
+    /// </summary>
+    IEnumerator IsDashing()
+    {
+        dashing = true;
+        yield return new WaitForSeconds(dashCooldown);
+        dashVelocity = Vector3.zero;
+        dashing = false;
+    }
 }
