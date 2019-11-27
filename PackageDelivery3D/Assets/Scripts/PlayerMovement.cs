@@ -40,7 +40,6 @@ public class PlayerMovement : MonoBehaviour, IInput
 		{
 			// Do the rotation here
 			rb.MoveRotation(Quaternion.LookRotation(_tempVector));
-
 		}
 
 		/*
