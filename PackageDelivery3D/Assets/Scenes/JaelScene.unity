@@ -169,7 +169,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31c029b8fc9e69f43b41c663e9089089, type: 2}
+  - {fileID: 2100000, guid: 81cda2d8cbd418b428bd630c5cae38db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -326,7 +326,7 @@ Camera:
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 2
+  m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
   m_SensorSize: {x: 21, y: 15.2}
@@ -421,7 +421,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5edd431fa3c11bd458e4c471dd4fa0f5, type: 2}
+  - {fileID: 2100000, guid: 82cb078110c5d6d4db01861dcd9f7cd0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -476,6 +476,7 @@ GameObject:
   - component: {fileID: 1403922938}
   - component: {fileID: 1403922937}
   - component: {fileID: 1403922939}
+  - component: {fileID: 1403922940}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -540,3 +541,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b601a13ecde91b4d9efac6d678470f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  motor: {fileID: 0}
+  controller: {fileID: 0}
+  forwardSpeed: 0
+  sidewaysSpeed: 0
+  jumpHeight: 0
+  gravity: 0
+  groundCheck: {fileID: 0}
+  groundDistance: 0.4
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &1403922940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403922935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0acdf7448028bf24c8a36a43d3984ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  motor: {fileID: 1403922939}
+  controller: {fileID: 0}
+  forwardSpeed: 0
+  sidewaysSpeed: 0
+  jumpHeight: 0
+  gravity: 0
+  groundCheck: {fileID: 0}
+  groundDistance: 0.4
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
