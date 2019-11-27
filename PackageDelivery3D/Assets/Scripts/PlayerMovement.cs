@@ -67,8 +67,8 @@ public class PlayerMovement : MonoBehaviour, IInput
 
 		charController.Move(moveDirection * Time.deltaTime);
 		charController.Move(velocity * Time.deltaTime);
-
-
+		if (moveDirection != Vector3.zero)
+			transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		/*
 		float _horizontal = Input.GetAxisRaw("Horizontal");
