@@ -5,17 +5,37 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour, IInput
 {
 	[SerializeField] private float movementSpeed = 4f;
-	[SerializeField] private Rigidbody rb;
+	[SerializeField] private float jumpHeight = 2f;
+	[SerializeField] private float gravity = -9.81f;
+	private bool isGrounded;
+
+
+	[Header("Collision en Drop Values")]
+
+	[Tooltip("De transform van het object wat het laagste punt van de speler aangeeft")]
+	[SerializeField] protected Transform groundCheck;
+
+	[Tooltip("De radius van de cirkel die om de groundCheck wordt gecast")]
+	[SerializeField] protected float groundDistance = 0.4f;
+
+	[Tooltip("Layermask om te bepalen wat wordt gezien als de Ground")]
+	[SerializeField] protected LayerMask groundMask;
+
+	[SerializeField] private CharacterController charController;
+
+	private Vector3 velocity = Vector3.zero;
+
+	private Vector3 moveDirection = Vector3.zero;
 
 	private void Awake()
 	{
-		rb = GetComponent<Rigidbody>();
+		charController = GetComponent<CharacterController>();
 	}
 
 	/// <summary>
 	/// FixedUpdate for Rigidbody and physics related actions.
 	/// </summary>
-	private void FixedUpdate()
+	public void Update()
 	{
 		Movement();
 	}
@@ -25,7 +45,32 @@ public class PlayerMovement : MonoBehaviour, IInput
 	/// </summary>
 	public void Movement()
 	{
-		
+		float _horizontal = Input.GetAxis("Horizontal");
+		float _vertical = Input.GetAxis("Vertical");
+
+		moveDirection = new Vector3(_horizontal, 0f, _vertical);
+
+		isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+		if (isGrounded && velocity.y < 0)
+		{
+			velocity.y = -2f;
+		}
+		velocity.y += gravity * Time.deltaTime;
+
+		if(Input.GetButton("Jump") && isGrounded)
+		{
+			velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+		}
+
+		moveDirection *= movementSpeed;
+
+		charController.Move(moveDirection * Time.deltaTime);
+		charController.Move(velocity * Time.deltaTime);
+
+
+
+		/*
 		float _horizontal = Input.GetAxisRaw("Horizontal");
 		float _vertical = Input.GetAxisRaw("Vertical");
 
@@ -41,6 +86,7 @@ public class PlayerMovement : MonoBehaviour, IInput
 			// Do the rotation here
 			rb.MoveRotation(Quaternion.LookRotation(_tempVector));
 		}
+		*/
 
 		/*
 		//Move relative to world space (so rotation doesn't affect movement)
@@ -55,13 +101,5 @@ public class PlayerMovement : MonoBehaviour, IInput
 		if (Input.GetAxis("Horizontal") != 0f || Input.GetAxis("Vertical") != 0f)
 			transform.rotation = Quaternion.Euler(0f, angle, 0f);
 		*/
-	}
-
-	/// <summary>
-	/// interface test
-	/// </summary>
-	public void TestingDebugs()
-	{
-		Debug.Log("Test TestingDebugs");
 	}
 }

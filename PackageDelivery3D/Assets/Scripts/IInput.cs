@@ -1,12 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-//Dit is een basis interface met simpelen methodes.
+﻿//Dit is een basis interface met simpelen methodes.
 public interface IInput
 {
 	void Movement();
-	void TestingDebugs();
 }
 
 /// <summary>
