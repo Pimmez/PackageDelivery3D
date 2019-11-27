@@ -36,8 +36,12 @@ public class PlayerMovement : MonoBehaviour, IInput
 
 		//transform.rotation = Quaternion.LookRotation(_tempVector);
 		rb.MovePosition(transform.position + _tempVector);
-		rb.MoveRotation(Quaternion.LookRotation(_tempVector));
-		
+		if (_tempVector != Vector3.zero)
+		{
+			// Do the rotation here
+			rb.MoveRotation(Quaternion.LookRotation(_tempVector));
+
+		}
 
 		/*
 		//Move relative to world space (so rotation doesn't affect movement)
