@@ -1,0 +1,9 @@
+﻿public enum GameStates
+{
+	NULLSTATE,
+	MENUSTATE,
+	GAMESTATE,
+	PAUSESTATE,
+	WINSTATE,
+	LOSESTATE
+}
