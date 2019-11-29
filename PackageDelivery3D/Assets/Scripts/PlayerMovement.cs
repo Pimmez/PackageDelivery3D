@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PlayerMovement : MonoBehaviour, IInput
 {
+	public static Action<CharacterController> ConveyorBeltEvent;
+
 	[SerializeField] private float movementSpeed = 4f;
 	[SerializeField] private float jumpHeight = 2f;
 	[SerializeField] private float gravity = -9.81f;
@@ -27,6 +30,10 @@ public class PlayerMovement : MonoBehaviour, IInput
 
 	private Vector3 moveDirection = Vector3.zero;
 
+	private int raycastDistance = 5;
+	[SerializeField] private LayerMask layerMask;
+	[SerializeField] private string ConveyorBeltName = "ConveyorBelt";
+
 	private void Awake()
 	{
 		charController = GetComponent<CharacterController>();
@@ -35,9 +42,26 @@ public class PlayerMovement : MonoBehaviour, IInput
 	/// <summary>
 	/// FixedUpdate for Rigidbody and physics related actions.
 	/// </summary>
-	public void Update()
+	private void Update()
 	{
 		Movement();
+		RayCastCheck();
+	}
+
+	private void RayCastCheck()
+	{
+		RaycastHit _hit;
+
+		if (Physics.Raycast(transform.position, Vector3.down, out _hit, raycastDistance, layerMask))
+		{
+			if (_hit.collider.name == ConveyorBeltName)
+			{
+				if (ConveyorBeltEvent != null)
+				{
+					ConveyorBeltEvent(charController);
+				}
+			}
+		}
 	}
 
 	/// <summary>
@@ -48,7 +72,7 @@ public class PlayerMovement : MonoBehaviour, IInput
 		float _horizontal = Input.GetAxis("Horizontal");
 		float _vertical = Input.GetAxis("Vertical");
 
-		moveDirection = new Vector3(_horizontal, 0f, _vertical);
+		moveDirection = new Vector3(_horizontal, 0f, _vertical).normalized;
 
 		isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
