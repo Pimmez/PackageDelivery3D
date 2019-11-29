@@ -490,7 +490,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0
+  m_AngularDrag: 0.5
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -563,7 +563,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 880053849}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.92, y: 0.28, z: 21.9}
+  m_LocalPosition: {x: 4.92, y: 0.28, z: 8.12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -582,10 +582,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 880053850}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 256
-  ConveyorBeltName: ConveyorBelt
 --- !u!1 &958115046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1268,6 +1264,10 @@ PrefabInstance:
     - target: {fileID: 1414745403, guid: 5499a9edc43536449b6bd012dabb1828, type: 3}
       propertyPath: layerMask.m_Bits
       value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 1414745403, guid: 5499a9edc43536449b6bd012dabb1828, type: 3}
+      propertyPath: pushPower
+      value: 200
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5499a9edc43536449b6bd012dabb1828, type: 3}

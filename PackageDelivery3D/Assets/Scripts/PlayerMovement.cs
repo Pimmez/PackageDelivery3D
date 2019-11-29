@@ -36,7 +36,10 @@ public class PlayerMovement : MonoBehaviour, IInput
 
 	private void Awake()
 	{
-		charController = GetComponent<CharacterController>();
+		if (charController == null)
+		{
+			charController = GetComponent<CharacterController>();
+		}
 	}
 
 	/// <summary>
@@ -82,7 +85,7 @@ public class PlayerMovement : MonoBehaviour, IInput
 		}
 		velocity.y += gravity * Time.deltaTime;
 
-		if(Input.GetButton("Jump") && isGrounded)
+		if (Input.GetButton("Jump") && isGrounded)
 		{
 			velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 		}
@@ -125,5 +128,35 @@ public class PlayerMovement : MonoBehaviour, IInput
 		if (Input.GetAxis("Horizontal") != 0f || Input.GetAxis("Vertical") != 0f)
 			transform.rotation = Quaternion.Euler(0f, angle, 0f);
 		*/
+	}
+
+	public int pushPower = 2;
+	int weight = 6;
+
+
+	//HAHAHA LOL HET WERKT NIET!!!!!
+	private void OnControllerColliderHit(ControllerColliderHit hit)
+	{
+		Rigidbody _body = hit.collider.attachedRigidbody;
+		Vector3 force;
+
+		// no rigidbody
+		if (_body == null || _body.isKinematic) { return; }
+
+		// We use gravity and weight to push things down, we use
+		// our velocity and push power to push things other directions
+		if (hit.moveDirection.y < -0.3)
+		{
+			force = Vector3.zero * gravity * weight;
+		}
+		else
+		{
+			Debug.Log("HALLOWOAS");
+
+			force = hit.controller.velocity * pushPower;
+		}
+
+		// Apply the push
+		_body.AddForceAtPosition(force, hit.point);
 	}
 }
