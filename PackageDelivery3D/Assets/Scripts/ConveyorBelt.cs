@@ -2,34 +2,31 @@
 
 public class ConveyorBelt : MonoBehaviour
 {
-	[SerializeField] private Vector3 adjustMovement;
-	[SerializeField] private Vector3 beltDirection;
+	[SerializeField] private float objectSpeed = 15f;
+	[SerializeField] private float playerSpeed = 15f;
 
-	private void OnCollisionStay(Collision obj)
+	[SerializeField] private Vector3 beltDirection = Vector3.zero;
+
+	private void OnCollisionStay(Collision other)
 	{
-		if (obj.gameObject.tag != Tags.Player)
+		if(other.gameObject.tag != Tags.Player)
 		{
-			float beltVelocity = 1 * Time.deltaTime;
-			obj.gameObject.GetComponent<Rigidbody>().velocity = beltVelocity * beltDirection;
+			float _beltVelocity = objectSpeed * Time.deltaTime;
+			other.gameObject.GetComponent<Rigidbody>().AddForce(_beltVelocity * beltDirection, ForceMode.VelocityChange);
+
 		}
 		else
 		{
-			return;
+			float _beltVelocity = playerSpeed * Time.deltaTime;
+			other.gameObject.GetComponent<Rigidbody>().AddForce(_beltVelocity * beltDirection, ForceMode.VelocityChange);
 		}
 	}
-
-	private void MovingBeltPlayer(CharacterController _charController)
+	
+	private void OnCollisionExit(Collision other)
 	{
-		_charController.SimpleMove(adjustMovement);
-	}
-
-	private void OnEnable()
-	{
-		PlayerMovement.ConveyorBeltEvent += MovingBeltPlayer;
-	}
-
-	private void OnDisable()
-	{
-		PlayerMovement.ConveyorBeltEvent -= MovingBeltPlayer;
+		if(other.gameObject.tag != Tags.Player)
+		{
+			other.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+		}
 	}
 }
