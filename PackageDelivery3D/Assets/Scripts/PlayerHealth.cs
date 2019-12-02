@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,4 +25,21 @@ public class PlayerHealth : MonoBehaviour
 			Destroy(this.gameObject);
 		}
     }
+
+	private void healthDecrease(int _damageAmount)
+	{
+		health -= _damageAmount;
+		//throw new NotImplementedException();
+	}
+
+	private void OnEnable()
+	{
+		SpikeBehaviour.SpikeEvent += healthDecrease;
+	}
+
+	private void OnDisable()
+	{
+		SpikeBehaviour.SpikeEvent -= healthDecrease;
+	}
+
 }

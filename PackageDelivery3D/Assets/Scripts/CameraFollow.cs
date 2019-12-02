@@ -8,7 +8,10 @@ public class CameraFollow : MonoBehaviour
 
 	private void Update()
     {
-		CameraLerp();
+		if(objectToFollow != null)
+		{
+			CameraLerp();
+		}
     }
 
 	private void CameraLerp()
