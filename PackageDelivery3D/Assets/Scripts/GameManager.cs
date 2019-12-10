@@ -5,6 +5,10 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
+
+	private IInput iinput;
+
+
 	private void EndScoreCalculations()
 	{
 		Debug.Log("Total Score is something");
