@@ -5,8 +5,17 @@ public class PlayerMovement : MonoBehaviour, IInput
 	[SerializeField] private float speed = 5f;
 	[SerializeField] private Rigidbody rb;
 
+	private Joystick joyStick;
+	private JoyButton joyButton;
+	private bool jump;
+
+
 	private void Awake()
 	{
+#if UNITY_ANDROID
+		//DO ANDROID
+		MobileStickInit();
+#endif
 		rb = GetComponent<Rigidbody>();
 	}
 
@@ -28,8 +37,7 @@ public class PlayerMovement : MonoBehaviour, IInput
 		Vector3 _movement = new Vector3(_moveHorizontal, 0.0f, _moveVertical);
 
 		rb.AddForce(_movement * speed, ForceMode.VelocityChange);
-		LookRotation();
-
+		LookRotation();	
 	}
 
 	public void WebMovement()
@@ -51,11 +59,23 @@ public class PlayerMovement : MonoBehaviour, IInput
 		Debug.Log("Controller Movement");
 		LookRotation();
 	}
-
+	
 	//DO ANDROID
+	//Initialize
+	private void MobileStickInit()
+	{
+		joyStick = FindObjectOfType<Joystick>();
+		joyButton = FindObjectOfType<JoyButton>();
+	}
+
+	//JoyStick Movement Android
 	public void MobileMovement()
 	{
 		Debug.Log("Mobile Movement");
+
+		Vector3 _movement = new Vector3(joyStick.Horizontal, rb.velocity.y, joyStick.Vertical);
+
+		rb.AddForce(_movement * speed, ForceMode.VelocityChange);
 		LookRotation();
 	}
 }
