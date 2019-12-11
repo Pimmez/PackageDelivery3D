@@ -5,9 +5,17 @@ public class PlayerMovement : MonoBehaviour, IInput
 	[SerializeField] private float speed = 5f;
 	[SerializeField] private Rigidbody rb;
 
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float gravity = 9.81f;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundDistance;
+    [SerializeField] private LayerMask groundMask;
+
 	private Joystick joyStick;
 	private JoyButton joyButton;
-	private bool jump;
+
+    private bool isGrounded;
+    private Vector3 velocity;
 
 
 	private void Awake()
@@ -29,6 +37,8 @@ public class PlayerMovement : MonoBehaviour, IInput
 
 	public void Movement()
 	{
+        isGrounded = false;
+
 		Debug.Log("DefaultStandalone Movement");
 
 		float _moveHorizontal = Input.GetAxis("Horizontal");
@@ -37,8 +47,33 @@ public class PlayerMovement : MonoBehaviour, IInput
 		Vector3 _movement = new Vector3(_moveHorizontal, 0.0f, _moveVertical);
 
 		rb.AddForce(_movement * speed, ForceMode.VelocityChange);
-		LookRotation();	
-	}
+		LookRotation();
+
+        ///<summary>
+        ///Vanaf hier wordt de jump geimplementeerd, nog geen overleg gehad
+        ///over hoe we dat bij de andere platforms implementeren
+        /// </summary>
+
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+
+        Debug.Log(velocity.y);
+
+        rb.AddForce(velocity, ForceMode.Acceleration);
+
+        if (isGrounded && Input.GetButtonDown("Jump"))
+        {
+            // Add a vertical force to the player.
+            isGrounded = false;
+            rb.AddForce(new Vector3(0f, jumpForce, 0f));
+        }
+    }
 
 	public void WebMovement()
 	{
