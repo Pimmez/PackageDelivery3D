@@ -15,6 +15,6 @@ Link naar WEBGL:
 https://studenthome.hku.nl/~pim.horeman/projecten.php?sheet=1
 
 Link naar APK:
-https://drive.google.com/file/d/1P_14uOJ-lbHs58UHUMF_k54-2HYymBC2/view?usp=sharing
+https://drive.google.com/open?id=1groS83_iD6kK961eo7kzONSbiJIuIPrm
 
 Windows Platform te vinden als je het project download.
