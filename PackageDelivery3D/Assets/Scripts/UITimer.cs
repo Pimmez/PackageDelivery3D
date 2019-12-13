@@ -8,9 +8,12 @@ public class UITimer : MonoBehaviour
 
 	[SerializeField] private TextMeshProUGUI timerText;
 
+	private bool isTimerActive = false;
+
 	private void Awake()
 	{
 		timerText = GetComponentInChildren<TextMeshProUGUI>();
+		isTimerActive = true;
 	}
 
 	private void Update()
@@ -24,11 +27,11 @@ public class UITimer : MonoBehaviour
 	private void CountDown()
 	{
 		timerSeconds -= Time.deltaTime;
-		if (timerSeconds > 0)
+		if (timerSeconds > 0 && isTimerActive == true)
 		{
 			UpdateLevelTimer(timerSeconds);
 		}
-		else
+		else if(timerSeconds <= 0 && isTimerActive == true)
 		{
 			Debug.Log("Timer over");
 		}
@@ -51,5 +54,20 @@ public class UITimer : MonoBehaviour
 		}
 
 		timerText.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+	}
+
+	private void StopTimer()
+	{
+		isTimerActive = false;
+	}
+
+	private void OnEnable()
+	{
+		FinishLine.finishEvent += StopTimer;
+	}
+
+	private void OnDisable()
+	{
+		FinishLine.finishEvent -= StopTimer;
 	}
 }
