@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class HUDManager : MonoBehaviour
 {
@@ -18,6 +19,10 @@ public class HUDManager : MonoBehaviour
 		joyStick.SetActive(true);
 #endif
 
+	}
 
+	public void ExitMenu(int _chooseLevel)
+	{
+		SceneManager.LoadScene(_chooseLevel);
 	}
 }

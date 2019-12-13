@@ -15,6 +15,7 @@ public class MovementUpdater : MonoBehaviour
 	{
 		if (isMovementActive == true)
 		{
+
 			iinput = GetComponent(typeof(IInput)) as IInput;
 
 #if UNITY_STANDALONE_WIN
@@ -35,22 +36,6 @@ public class MovementUpdater : MonoBehaviour
 	//DO ANDROID
 		iinput.MobileMovement();
 #endif
-
 		}
-	}
-
-	private void StopMovement()
-	{
-		isMovementActive = false;
-	}
-
-	private void OnEnable()
-	{
-		FinishLine.finishEvent += StopMovement;
-	}
-
-	private void OnDisable()
-	{
-		FinishLine.finishEvent -= StopMovement;
 	}
 }
